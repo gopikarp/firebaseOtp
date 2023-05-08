@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
@@ -11,6 +12,8 @@ class MyVerify extends StatefulWidget {
 class _MyVerifyState extends State<MyVerify> {
   @override
   Widget build(BuildContext context) {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final vid = ModalRoute.of(context)!.settings.arguments as Map;
     final defaultPinTheme = PinTheme(
       width: 56,
       height: 56,
@@ -34,7 +37,7 @@ class _MyVerifyState extends State<MyVerify> {
         color: Color.fromRGBO(234, 239, 243, 1),
       ),
     );
-
+    String otpcode = '';
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -89,7 +92,11 @@ class _MyVerifyState extends State<MyVerify> {
                 // submittedPinTheme: submittedPinTheme,
 
                 showCursor: true,
-                onCompleted: (pin) => print(pin),
+                onCompleted: (pin) {
+                  setState(() {
+                    otpcode = pin;
+                  });
+                },
               ),
               SizedBox(
                 height: 20,
@@ -102,7 +109,17 @@ class _MyVerifyState extends State<MyVerify> {
                         primary: Colors.green.shade600,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
-                    onPressed: () {},
+                    onPressed: () async {
+                      PhoneAuthCredential credential =
+                          PhoneAuthProvider.credential(
+                              verificationId: vid["id"], smsCode: otpcode);
+                      await auth.signInWithCredential(credential);
+                      if (credential != null) {
+                        Navigator.pushNamed(context, 'home');
+                      } else {
+                        print("Failed..");
+                      }
+                    },
                     child: Text("Verify Phone Number")),
               ),
               Row(

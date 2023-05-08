@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:phone_otp_ui/home.dart';
 
@@ -18,12 +18,12 @@ class _MyPhoneState extends State<MyPhone> {
     // TODO: implement initState
     countryController.text = "+91";
     super.initState();
+    // _verifyPhone();
   }
 
   var phone = '';
   final FirebaseAuth _auth = FirebaseAuth.instance;
-//
-
+  String? _verificationCode;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,34 +109,34 @@ class _MyPhoneState extends State<MyPhone> {
                 width: double.infinity,
                 height: 45,
                 child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        primary: Colors.green.shade600,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
-                    onPressed: () async {
-                      await FirebaseAuth.instance.verifyPhoneNumber(
-                        phoneNumber: '${countryController.text + phone}',
-                        verificationCompleted:
-                            (PhoneAuthCredential credential) async {
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) => home(),
-                          //   ),
-                          // );
-                        },
-                        verificationFailed: (FirebaseAuthException e) {
-                          print('fail/////////////');
-                        },
-                        codeSent: (String verificationId, int? resendToken) {
-                          Navigator.pushNamed(context, 'verify');
-                        },
-                        codeAutoRetrievalTimeout: (String verificationId) {},
-                      );
-                      // varifyPhone();
-                      // Navigator.pushNamed(context, 'verify');
-                    },
-                    child: Text("Send the code")),
-              )
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.green.shade600,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10))),
+                  onPressed: () async {
+                    await FirebaseAuth.instance.verifyPhoneNumber(
+                      phoneNumber: '+91 $phone',
+                      verificationCompleted:
+                          (PhoneAuthCredential credential) async {},
+                      verificationFailed: (FirebaseAuthException e) {
+                        // if (e.code == 'invalid-phone-number') {
+                        //   print('The provided phone number is not valid.');
+                        // }
+                        print(e);
+                      },
+                      codeSent:
+                          (String verificationId, int? resendToken) async {
+                        Navigator.pushNamed(context, "verify",
+                            arguments: {"id": verificationId});
+                      },
+                      codeAutoRetrievalTimeout: (String verificationId) {},
+                    );
+                    // varifyPhone();
+                    // Navigator.pushNamed(context, 'verify');
+                  },
+                  child: Text("Send the code"),
+                ),
+              ),
             ],
           ),
         ),
@@ -144,6 +144,7 @@ class _MyPhoneState extends State<MyPhone> {
     );
   }
 
+//1
   // varifyPhone() async {
   //   await FirebaseAuth.instance.verifyPhoneNumber(
   //     phoneNumber: '${countryController.text + phone}',
@@ -153,4 +154,114 @@ class _MyPhoneState extends State<MyPhone> {
   //     codeAutoRetrievalTimeout: (String verificationId) {},
   //   );
   // }
+//2
+  // _verifyPhone() async {
+  //   await FirebaseAuth.instance.verifyPhoneNumber(
+  //       phoneNumber: '${countryController.text + phone}',
+  //       verificationCompleted: (PhoneAuthCredential credential) async {
+  //         await FirebaseAuth.instance
+  //             .signInWithCredential(credential)
+  //             .then((value) async {
+  //           if (value.user != null) {
+  //             Navigator.pushAndRemoveUntil(
+  //                 context,
+  //                 MaterialPageRoute(builder: (context) => home()),
+  //                 (route) => false);
+  //           }
+  //         });
+  //       },
+  //       verificationFailed: (FirebaseAuthException e) {
+  //         print(e.message);
+  //       },
+  //       codeSent: (String? verficationID, int? resendToken) {
+  //         setState(() {
+  //           _verificationCode = verficationID;
+  //         });
+  //       },
+  //       codeAutoRetrievalTimeout: (String verificationID) {
+  //         setState(() {
+  //           _verificationCode = verificationID;
+  //         });
+  //       },
+  //       timeout: Duration(seconds: 10));
+  // }
+//3
+  // _verifyPhone() async {
+  //   await FirebaseAuth.instance.verifyPhoneNumber(
+  //     phoneNumber: '${countryController.text + phone}',
+  //     verificationCompleted: (PhoneAuthCredential credential) async {
+  //       await _auth.signInWithCredential(credential);
+  //       // Navigator.of(context).push(
+  //       //   MaterialPageRoute(
+  //       //     builder: (context) => home(),
+  //       //   ),
+  //       // );
+  //     },
+  //     verificationFailed: (FirebaseAuthException e) {
+  //       // if (e.code == 'invalid-phone-number') {
+  //       //   print('The provided phone number is not valid.');
+  //       // }
+
+  //       // print('fail/////////////');
+  //     },
+  //     timeout: Duration(seconds: 120),
+  //     codeSent: (String verificationId, int? resendToken) async {
+  //       // Update the UI - wait for the user to enter the SMS code
+  //       String smsCode = 'xxxx';
+
+  //       // Create a PhoneAuthCredential with the code
+  //       PhoneAuthCredential credential = PhoneAuthProvider.credential(
+  //           verificationId: verificationId, smsCode: smsCode);
+
+  //       // Sign the user in (or link) with the credential
+  //       await _auth.signInWithCredential(credential);
+  //       Navigator.pushNamed(context, 'verify');
+  //     },
+  //     codeAutoRetrievalTimeout: (String verificationId) {},
+  //   );
+
+  //   // varifyPhone();
+  //   // Navigator.pushNamed(context, 'verify');
+  // }
 }
+
+
+
+  // await FirebaseAuth.instance.verifyPhoneNumber(
+  //                     phoneNumber: '${countryController.text + phone}',
+  //                     verificationCompleted:
+  //                         (PhoneAuthCredential credential) async {
+  //                       await _auth.signInWithCredential(credential);
+  //                       // Navigator.of(context).push(
+  //                       //   MaterialPageRoute(
+  //                       //     builder: (context) => home(),
+  //                       //   ),
+  //                       // );
+  //                     },
+  //                     verificationFailed: (FirebaseAuthException e) {
+  //                       // if (e.code == 'invalid-phone-number') {
+  //                       //   print('The provided phone number is not valid.');
+  //                       // }
+
+  //                       // print('fail/////////////');
+  //                     },
+  //                     timeout: Duration(seconds: 120),
+  //                     codeSent:
+  //                         (String verificationId, int? resendToken) async {
+  //                       // Update the UI - wait for the user to enter the SMS code
+  //                       String smsCode = 'xxxx';
+
+  //                       // Create a PhoneAuthCredential with the code
+  //                       PhoneAuthCredential credential =
+  //                           PhoneAuthProvider.credential(
+  //                               verificationId: verificationId,
+  //                               smsCode: smsCode);
+
+  //                       // Sign the user in (or link) with the credential
+  //                       await _auth.signInWithCredential(credential);
+  //                       Navigator.pushNamed(context, 'verify');
+  //                     },
+  //                     codeAutoRetrievalTimeout: (String verificationId) {},
+  //                   );
+  //                   // varifyPhone();
+  //                   // Navigator.pushNamed(context, 'verify');
